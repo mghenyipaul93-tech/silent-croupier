@@ -16,7 +16,6 @@ class Card:
 
         if rank not in Card.accepted_ranks:
             raise ValueError("Invalid rank")
-        
 
         self.suit = suit
         self.rank = rank
@@ -26,10 +25,10 @@ class Card:
 
 
 if __name__ == "__main__":
-    card1 = Card("Hearts", "Ace")
-    card2 = Card("Spades", "10")
-    card3 = Card("Diamonds", "Jack")
+    c1 = Card("Hearts", "Ace")
+    c2 = Card("Spades", "10")
+    c3 = Card("Diamonds", "Jack")
 
-    print(card1)
-    print(card2)
-    print(card3)
+    print(c1)
+    print(c2)
+    print(c3)
