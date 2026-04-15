@@ -11,23 +11,18 @@ class Player:
         self.name = name
         self.balance = balance
 
-  
     def place_initial_bet(self):
         while True:
-            amount = input(
-                f"{self.name}, current balance is {self.balance}, enter your bet: "
-            )
+            amount = input(f"{self.name}, balance {self.balance}, enter bet: ")
 
             if amount.isdigit() and 0 < int(amount) <= self.balance:
                 amount = int(amount)
-                self.total_bet_amount += amount
                 self.balance -= amount
+                self.total_bet_amount += amount
                 return amount
             else:
-                print("Invalid input. Enter a number within your balance.")
+                print("Invalid input.")
 
-  
-   
     def choose_action(self):
         choice = input("1: Call | 2: Fold | 3: Raise: ")
 
@@ -41,28 +36,34 @@ class Player:
             print("Invalid choice")
             return self.choose_action()
 
-  
-    def call(self, amount):
-        if self.balance >= amount:
-            self.balance -= amount
-            self.total_bet_amount += amount
-            print(f"{self.name} calls {amount}")
-            return amount
-        else:
-            print(f"{self.name} cannot call. Not enough balance.")
+    def call(self, opponent_bet):
+        diff = opponent_bet - self.total_bet_amount
+
+        if diff <= 0:
+            print(f"{self.name} checks.")
             return 0
+
+        if diff > self.balance:
+            print(f"{self.name} cannot call.")
+            return "fold"
+
+        self.balance -= diff
+        self.total_bet_amount += diff
+
+        print(f"{self.name} calls {diff}")
+        return diff
 
     def fold(self):
         print(f"{self.name} folds.")
         return "fold"
 
-    def raise_bet(self, current_bet):
+    def raise_bet(self, opponent_bet):
         while True:
-            amount = input(f"Enter raise amount (balance: {self.balance}): ")
+            amount = input(f"Enter raise amount (balance {self.balance}): ")
 
             if amount.isdigit() and int(amount) > 0:
                 amount = int(amount)
-                total = current_bet + amount
+                total = (opponent_bet - self.total_bet_amount) + amount
 
                 if total <= self.balance:
                     self.balance -= total
@@ -74,44 +75,33 @@ class Player:
             else:
                 print("Invalid input.")
 
-    
-   
-    def auto_match_or_raise(self, current_bet):
-
+    def auto_action(self, opponent_bet):
         print("Computer is thinking...")
         time.sleep(1.5)
 
-        action = random.choice(["match", "raise"])
+        diff = opponent_bet - self.total_bet_amount
 
-        # MATCH
-        if action == "match":
-            if self.balance >= current_bet:
-                self.balance -= current_bet
-                self.total_bet_amount += current_bet
-                print(f"Computer matched the bet: {current_bet}")
-                return current_bet
-            else:
-                print("Computer folds.")
-                return 0
+        if diff > self.balance:
+            print("Computer folds.")
+            return "fold"
 
-        # RAISE
-        raise_amount = random.randint(1, max(1, self.balance // 2))
-        total_needed = current_bet + raise_amount
+        action = random.choice(["call", "raise"])
 
-        if total_needed > self.balance:
-            total_needed = self.balance
+        if action == "call":
+            return self.call(opponent_bet)
 
-        self.balance -= total_needed
-        self.total_bet_amount += total_needed
+        raise_amount = random.randint(1, max(1, self.balance // 3))
+        total = diff + raise_amount
 
-        print(f"Computer raised by {raise_amount} (total bet: {total_needed})")
-        return total_needed
+        if total > self.balance:
+            total = self.balance
 
-   
-    def update_amount_bet(self, amount):
-        self.total_bet_amount += amount
+        self.balance -= total
+        self.total_bet_amount += total
 
-   
+        print(f"Computer raises by {raise_amount}")
+        return total
+
     def reset(self):
         self.cards = []
         self.total_bet_amount = 0
