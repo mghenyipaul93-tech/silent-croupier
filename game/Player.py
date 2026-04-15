@@ -11,8 +11,7 @@ class Player:
         self.name = name
         self.balance = balance
 
-    # HUMAN BETTING
-    
+  
     def place_initial_bet(self):
         while True:
             amount = input(
@@ -27,8 +26,55 @@ class Player:
             else:
                 print("Invalid input. Enter a number within your balance.")
 
+  
+   
+    def choose_action(self):
+        choice = input("1: Call | 2: Fold | 3: Raise: ")
+
+        if choice == "1":
+            return "call"
+        elif choice == "2":
+            return "fold"
+        elif choice == "3":
+            return "raise"
+        else:
+            print("Invalid choice")
+            return self.choose_action()
+
+  
+    def call(self, amount):
+        if self.balance >= amount:
+            self.balance -= amount
+            self.total_bet_amount += amount
+            print(f"{self.name} calls {amount}")
+            return amount
+        else:
+            print(f"{self.name} cannot call. Not enough balance.")
+            return 0
+
+    def fold(self):
+        print(f"{self.name} folds.")
+        return "fold"
+
+    def raise_bet(self, current_bet):
+        while True:
+            amount = input(f"Enter raise amount (balance: {self.balance}): ")
+
+            if amount.isdigit() and int(amount) > 0:
+                amount = int(amount)
+                total = current_bet + amount
+
+                if total <= self.balance:
+                    self.balance -= total
+                    self.total_bet_amount += total
+                    print(f"{self.name} raises by {amount}")
+                    return total
+                else:
+                    print("Not enough balance.")
+            else:
+                print("Invalid input.")
+
     
-    # COMPUTER BETTING
    
     def auto_match_or_raise(self, current_bet):
 
@@ -37,7 +83,7 @@ class Player:
 
         action = random.choice(["match", "raise"])
 
-        # MATCH LOGIC
+        # MATCH
         if action == "match":
             if self.balance >= current_bet:
                 self.balance -= current_bet
@@ -45,10 +91,10 @@ class Player:
                 print(f"Computer matched the bet: {current_bet}")
                 return current_bet
             else:
-                print("Computer cannot match. Folds.")
+                print("Computer folds.")
                 return 0
 
-        # RAISE LOGIC
+        # RAISE
         raise_amount = random.randint(1, max(1, self.balance // 2))
         total_needed = current_bet + raise_amount
 
@@ -61,13 +107,11 @@ class Player:
         print(f"Computer raised by {raise_amount} (total bet: {total_needed})")
         return total_needed
 
-    # BET UPDATE 
    
     def update_amount_bet(self, amount):
         self.total_bet_amount += amount
 
-    # RESET FOR NEW ROUND
-
+   
     def reset(self):
         self.cards = []
         self.total_bet_amount = 0
