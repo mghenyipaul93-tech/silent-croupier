@@ -30,7 +30,7 @@ class Game():
             balance=1000
         )
 
-        self._turn = self.human   # keep your turn system
+        self._turn = self.human
 
     @property
     def turn(self):
@@ -48,5 +48,12 @@ class Game():
 if __name__ == "__main__":
     game = Game()
 
-    print("Human cards:", [str(c) for c in game.human.cards])
-    print("Computer cards:", [str(c) for c in game.computer.cards])
+    print("\n--- GAME START ---\n")
+
+    print("Computer cards:")
+    for card in game.computer.cards:
+        print(card)
+
+    print("\nHuman cards:")
+    for card in game.human.cards:
+        print(card)
