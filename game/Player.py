@@ -11,6 +11,10 @@ class Player:
         self.name = name
         self.balance = balance
 
+    def reset(self):
+        self.cards = []
+        self.total_bet_amount = 0
+
     def place_initial_bet(self):
         while True:
             amount = input(f"{self.name}, balance {self.balance}, enter bet: ")
@@ -63,7 +67,9 @@ class Player:
 
             if amount.isdigit() and int(amount) > 0:
                 amount = int(amount)
-                total = (opponent_bet - self.total_bet_amount) + amount
+
+                diff = opponent_bet - self.total_bet_amount
+                total = diff + amount
 
                 if total <= self.balance:
                     self.balance -= total
@@ -75,33 +81,45 @@ class Player:
             else:
                 print("Invalid input.")
 
-    def auto_action(self, opponent_bet):
+    def auto_call_raise(self, opponent, round_count):
+
         print("Computer is thinking...")
         time.sleep(1.5)
 
+        opponent_bet = opponent.total_bet_amount
         diff = opponent_bet - self.total_bet_amount
 
+        print(f"Human bet: {opponent_bet}")
+        print(f"Computer bet: {self.total_bet_amount}")
+
+    
+        if diff <= 0:
+            print("Computer checks.")
+            return 0
+
+        
         if diff > self.balance:
             print("Computer folds.")
             return "fold"
 
         action = random.choice(["call", "raise"])
 
+        
+        if round_count >= 3:
+            action = "call"
+
         if action == "call":
-            return self.call(opponent_bet)
+            self.balance -= diff
+            self.total_bet_amount += diff
+            print(f"Computer calls {diff}")
+            return diff
 
-        raise_amount = random.randint(1, max(1, self.balance // 3))
+        
+        raise_amount = random.randint(1, min(50, self.balance - diff))
         total = diff + raise_amount
-
-        if total > self.balance:
-            total = self.balance
 
         self.balance -= total
         self.total_bet_amount += total
 
         print(f"Computer raises by {raise_amount}")
         return total
-
-    def reset(self):
-        self.cards = []
-        self.total_bet_amount = 0
